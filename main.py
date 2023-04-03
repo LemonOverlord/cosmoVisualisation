@@ -23,11 +23,38 @@ class Canvas(QWidget):
 
 class Axis:
 
-    def __init__(self, parent: QWidget, h: int, w: int):
+    def __init__(self, parent: Canvas, h: int, w: int):
 
         self.parent = parent
         self.grid = parent.figure.add_gridspec(h, w, hspace=0, wspace=0)
         self.axis = self.grid.subplots(sharex=True, sharey=True)
+        
+
+class Plot:
+
+    def __init__(self, parent: Axis, axis_id: int, xdata: list, ydata: list, *_, scale_x=10, scale_y):
+
+        if xdata is None:
+            data_x = []
+        if ydata is None:
+            data_y = []
+        if axis_id is None:
+            axis_id = 0
+
+        self.parent = parent
+        self.plot = parent.axis[axis_id].plot(xdata, ydata)
+        self.scale_x = scale_x
+        self.scale_y = scale_y
+
+    def update(self, new_ydata: list, new_xdata: list):
+
+        if new_ydata is None:
+            new_ydata = []
+        if new_xdata is None:
+            new_xdata = []
+
+        self.plot.set_ydata(new_ydata)
+        self.plot.set_xdata(new_xdata)
 
 
 x = numpy.linspace(0, 2 * numpy.pi, 10)
@@ -40,25 +67,27 @@ layout = QGridLayout(window)
 layout.setVerticalSpacing(0)
 
 
-accel_canvas = Canvas(window)
-layout.addWidget(accel_canvas, 0, 1, 2, 1)
+canvas1 = Canvas(window)
+layout.addWidget(canvas1, 0, 1, 2, 1)
 
-accel_axes = Axis(accel_canvas, 3, 1)
-accel_plot1 = accel_axes.axis[0].plot(x, y)
-
-
-bar_canvas = Canvas(window)
-layout.addWidget(bar_canvas, 0, 0, 1, 1)
-
-bar_axis = Axis(bar_canvas, 1, 1)
-bar_plot = bar_axis.axis.plot(x, y)
+axes1 = Axis(canvas1, 3, 1)
+plot1_1 = axes1.axis[0].plot(x, y)
+plot1_2 = axes1.axis[0].plot(y, x)
 
 
-temp_canvas = Canvas(window)
-layout.addWidget(temp_canvas, 1, 0, 1, 1)
+canvas2 = Canvas(window)
+layout.addWidget(canvas2, 0, 0, 1, 1)
 
-temp_axis = Axis(temp_canvas, 1, 1)
-temp_plot = temp_axis.axis.plot(x, y)
+axis2 = Axis(canvas2, 1, 1)
+plot2_1 = axis2.axis.plot(x, y)
+plot2_2 = axis2.axis.plot(y, x)
+
+
+canvas3 = Canvas(window)
+layout.addWidget(canvas3, 1, 0, 1, 1)
+
+axis3 = Axis(canvas3, 1, 1)
+plot3 = axis3.axis.plot(x, y)
 
 
 window.show()
